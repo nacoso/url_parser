@@ -13,17 +13,33 @@ class UrlParser
   end
 
   def port
-    return @new_url.split("/")[2].split(":")[1]
+    if @new_url.split(":").last.split("/").first == "" && scheme == "http"
+      '80'
+    elsif @new_url.split(":").last.split("/").first == "" && scheme == "https"
+      "443"
+    else
+      @new_url.split(":").last.split("/").first
+    end
   end
 
   def path
-    return @new_url.split("/")[3].split("?")[0]
+    if @new_url.split("/")[3].split("?")[0] == ""
+      nil
+    else
+      return @new_url.split("/")[3].split("?")[0]
+    end
   end
 
   def query_string
-    @url_array = [@new_url.split("?")[1].split("=")[0], @new_url.split("?")[1].split("=")[1].split("&")[0], @new_url.split("?")[1].split("=")[1].split("&")[1], @new_url.split("?")[1].split("=")[2].split("#")[0]]
+    query_string = @new_url.split("?")[1].split("#")[0].split("&")
+    query_hash = {}
 
-    Hash[*@url_array]
+    query_string.each do |kvpair|
+      query_hash[kvpair.split("=")[0]] = kvpair.split("=")[1]
+    end
+
+    return query_hash
+
   end
 
   def fragment_id
